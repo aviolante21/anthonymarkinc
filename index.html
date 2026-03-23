@@ -168,7 +168,7 @@
 
   .tier-name {
     font-family: 'Instrument Serif', serif;
-    font-size: 16px;
+    font-size: 22px;
     color: var(--gold2);
     margin-bottom: 2px;
   }
@@ -446,6 +446,60 @@
     .metrics-grid { grid-template-columns: 1fr 1fr; }
     .page { padding: 1.5rem 1rem 3rem; }
   }
+
+  .toggle-wrap { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+  .toggle-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .toggle-label.on { color: #65d16b; }
+
+  .toggle {
+    position: relative;
+    width: 48px;
+    height: 26px;
+    cursor: pointer;
+  }
+
+  .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+
+  .toggle-track {
+    position: absolute;
+    inset: 0;
+    background: var(--s4);
+    border-radius: 13px;
+    border: 1px solid var(--border2);
+    transition: background 0.25s, border-color 0.25s;
+  }
+
+  .toggle input:checked + .toggle-track {
+    background: rgba(101,209,107,0.2);
+    border-color: #65d16b;
+  }
+
+  .toggle-thumb {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--muted2);
+    transition: transform 0.25s, background 0.25s;
+    pointer-events: none;
+  }
+
+  .toggle input:checked ~ .toggle-thumb {
+    transform: translateX(22px);
+    background: #65d16b;
+  }
+
 </style>
 </head>
 <body>
@@ -457,7 +511,14 @@
       <div class="brand-logo">Anthony Mark, <em>Inc.</em></div>
       <div class="brand-sub">Revenue Intelligence Dashboard</div>
     </div>
-    <div class="header-badge">Private · Internal Use</div>
+    <div class="toggle-wrap">
+      <span class="toggle-label" id="toggle-label">Baseline Client</span>
+      <label class="toggle">
+        <input type="checkbox" id="baseline-toggle" onchange="onBaselineToggle()">
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+      </label>
+    </div>
   </header>
 
   <!-- TIER CONFIGURATION -->
@@ -587,6 +648,17 @@
 </div>
 
 <script>
+
+const BASELINE = { total: 11500, ant: 10000, kat: 1500 };
+let baselineOn = false;
+
+function onBaselineToggle() {
+  baselineOn = document.getElementById('baseline-toggle').checked;
+  const label = document.getElementById('toggle-label');
+  label.className = 'toggle-label' + (baselineOn ? ' on' : '');
+  recalc();
+}
+
 const TIERS = [
   { name: 'Silver',   rate: 1500, color: '#a8b8c8', clients: 0 },
   { name: 'Gold',     rate: 3000, color: '#65d16b', clients: 0 },
@@ -637,9 +709,16 @@ function recalc() {
   let tc = 0, gross = 0;
   TIERS.forEach(t => { tc += t.clients; gross += t.clients * (t.rate || 0); });
 
-  const ant = gross * 0.6, kat = gross * 0.4;
+  // Add baseline on top if toggled on
+  const baseGross = baselineOn ? BASELINE.total : 0;
+  const baseAnt   = baselineOn ? BASELINE.ant   : 0;
+  const baseKat   = baselineOn ? BASELINE.kat   : 0;
+
+  const totalGross = gross + baseGross;
+  const ant = (gross * 0.6) + baseAnt;
+  const kat = (gross * 0.4) + baseKat;
   document.getElementById('m-clients').textContent = tc;
-  document.getElementById('m-gross').textContent = fmt(gross);
+  document.getElementById('m-gross').textContent = fmt(totalGross);
   document.getElementById('m-ant').textContent = fmt(ant);
   document.getElementById('m-kat').textContent = fmt(kat);
   document.getElementById('ant-mo').textContent = fmt(ant);
@@ -650,7 +729,7 @@ function recalc() {
   let html = '', cum = 0, cumAnt = 0, cumKat = 0;
   const cumA = [], cumAntA = [], cumKatA = [];
   for (let i = 0; i < 12; i++) {
-    cum += gross; cumAnt += ant; cumKat += kat;
+    cum += totalGross; cumAnt += ant; cumKat += kat;
     cumA.push(cum); cumAntA.push(cumAnt); cumKatA.push(cumKat);
     const m = [3, 6, 12].includes(i + 1);
     html += `<tr class="${m ? 'milestone' : ''}">
