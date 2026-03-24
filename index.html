@@ -802,11 +802,11 @@
         </div>
         <div class="partner-stats">
           <div>
-            <div class="pstat-label">Monthly</div>
+            <div class="pstat-label">Net / Month <span style="font-size:8px;opacity:0.6">after 30% tax</span></div>
             <div class="pstat-val" id="ant-mo" style="color:#DA012D">$0</div>
           </div>
           <div style="text-align:right">
-            <div class="pstat-label">Annual</div>
+            <div class="pstat-label">Net / Year <span style="font-size:8px;opacity:0.6">after 30% tax</span></div>
             <div class="pstat-val" id="ant-yr" style="color:#DA012D">$0</div>
           </div>
         </div>
@@ -825,11 +825,11 @@
         </div>
         <div class="partner-stats">
           <div>
-            <div class="pstat-label">Monthly</div>
+            <div class="pstat-label">Net / Month <span style="font-size:8px;opacity:0.6">after 30% tax</span></div>
             <div class="pstat-val" id="kat-mo" style="color:var(--pink)">$0</div>
           </div>
           <div style="text-align:right">
-            <div class="pstat-label">Annual</div>
+            <div class="pstat-label">Net / Year <span style="font-size:8px;opacity:0.6">after 30% tax</span></div>
             <div class="pstat-val" id="kat-yr" style="color:var(--pink)">$0</div>
           </div>
         </div>
@@ -863,8 +863,8 @@
           <tr>
             <th>Month</th>
             <th style="color:#60b177">Cumulative</th>
-            <th style="color:#DA012D">Anthony 65%</th>
-            <th style="color:var(--pink)">Katie 35%</th>
+            <th style="color:#DA012D">Anthony 65% Net</th>
+            <th style="color:var(--pink)">Katie 35% Net</th>
           </tr>
         </thead>
         <tbody id="proj-body"></tbody>
@@ -966,15 +966,16 @@ function recalc() {
   document.getElementById('m-gross').textContent = fmt(totalGross);
   document.getElementById('m-ant').textContent = fmt(ant);
   document.getElementById('m-kat').textContent = fmt(kat);
-  document.getElementById('ant-mo').textContent = fmt(ant);
-  document.getElementById('ant-yr').textContent = fmt(ant * 12);
-  document.getElementById('kat-mo').textContent = fmt(kat);
-  document.getElementById('kat-yr').textContent = fmt(kat * 12);
+  const TAX = 0.30;
+  document.getElementById('ant-mo').textContent = fmt(ant * (1 - TAX));
+  document.getElementById('ant-yr').textContent = fmt(ant * 12 * (1 - TAX));
+  document.getElementById('kat-mo').textContent = fmt(kat * (1 - TAX));
+  document.getElementById('kat-yr').textContent = fmt(kat * 12 * (1 - TAX));
 
   let html = '', cum = 0, cumAnt = 0, cumKat = 0;
   const cumA = [], cumAntA = [], cumKatA = [];
   for (let i = 0; i < 12; i++) {
-    cum += totalGross; cumAnt += ant; cumKat += kat;
+    cum += totalGross; cumAnt += ant * 0.70; cumKat += kat * 0.70;
     cumA.push(cum); cumAntA.push(cumAnt); cumKatA.push(cumKat);
     const m = [3, 6, 12].includes(i + 1);
     html += `<tr class="${m ? 'milestone' : ''}">
