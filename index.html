@@ -807,11 +807,11 @@
         </div>
         <div class="partner-stats">
           <div>
-            <div class="pstat-label" id="ant-mo-label">Net / Month <span id="ant-tax-note" style="font-size:8px;opacity:0.6">after 30% tax</span></div>
+            <div class="pstat-label" id="ant-mo-label">Net / Month <span id="ant-tax-note" style="font-size:8px;opacity:0.6">after 35% tax</span></div>
             <div class="pstat-val" id="ant-mo" style="color:#DA012D">$0</div>
           </div>
           <div style="text-align:right">
-            <div class="pstat-label" id="ant-yr-label">Net / Year <span id="ant-tax-note2" style="font-size:8px;opacity:0.6">after 30% tax</span></div>
+            <div class="pstat-label" id="ant-yr-label">Net / Year <span id="ant-tax-note2" style="font-size:8px;opacity:0.6">after 35% tax</span></div>
             <div class="pstat-val" id="ant-yr" style="color:#DA012D">$0</div>
           </div>
         </div>
@@ -830,11 +830,11 @@
         </div>
         <div class="partner-stats">
           <div>
-            <div class="pstat-label" id="kat-mo-label">Net / Month <span id="kat-tax-note" style="font-size:8px;opacity:0.6">after 30% tax</span></div>
+            <div class="pstat-label" id="kat-mo-label">Net / Month <span id="kat-tax-note" style="font-size:8px;opacity:0.6">after 35% tax</span></div>
             <div class="pstat-val" id="kat-mo" style="color:var(--pink)">$0</div>
           </div>
           <div style="text-align:right">
-            <div class="pstat-label" id="kat-yr-label">Net / Year <span id="kat-tax-note2" style="font-size:8px;opacity:0.6">after 30% tax</span></div>
+            <div class="pstat-label" id="kat-yr-label">Net / Year <span id="kat-tax-note2" style="font-size:8px;opacity:0.6">after 35% tax</span></div>
             <div class="pstat-val" id="kat-yr" style="color:var(--pink)">$0</div>
           </div>
         </div>
@@ -893,7 +893,7 @@ function onTaxToggle() {
   var label = document.getElementById('toggle-label');
   label.className = 'toggle-label' + (taxOn ? ' on' : '');
 
-  var note = taxOn ? 'after 30% tax' : '';
+  var note = taxOn ? 'after 35% tax' : '';
   var moLabel = taxOn ? 'Net / Month' : 'Gross / Month';
   var yrLabel = taxOn ? 'Net / Year'  : 'Gross / Year';
   var splitLbl = taxOn ? 'Net Ownership Split' : 'Gross Ownership Split';
@@ -997,7 +997,7 @@ function recalc() {
   document.getElementById('m-gross').textContent = fmt(totalGross);
   document.getElementById('m-ant').textContent = fmt(ant);
   document.getElementById('m-kat').textContent = fmt(kat);
-  const TAX = taxOn ? 0.30 : 0;
+  const TAX = taxOn ? 0.35 : 0;
   document.getElementById('ant-mo').textContent = fmt(ant * (1 - TAX));
   document.getElementById('ant-yr').textContent = fmt(ant * 12 * (1 - TAX));
   document.getElementById('kat-mo').textContent = fmt(kat * (1 - TAX));
@@ -1006,7 +1006,7 @@ function recalc() {
   let html = '', cum = 0, cumAnt = 0, cumKat = 0;
   const cumA = [], cumAntA = [], cumKatA = [];
   for (let i = 0; i < 12; i++) {
-    cum += totalGross; cumAnt += ant * (1 - (taxOn ? 0.30 : 0)); cumKat += kat * (1 - (taxOn ? 0.30 : 0));
+    cum += totalGross; cumAnt += ant * (1 - (taxOn ? 0.35 : 0)); cumKat += kat * (1 - (taxOn ? 0.35 : 0));
     cumA.push(cum); cumAntA.push(cumAnt); cumKatA.push(cumKat);
     const m = [3, 6, 12].includes(i + 1);
     html += `<tr class="${m ? 'milestone' : ''}">
