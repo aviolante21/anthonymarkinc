@@ -510,6 +510,15 @@
     overflow: hidden;
   }
 
+  .roster-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .roster-inner {
+    min-width: 600px;
+  }
+
   .roster-head {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
@@ -685,17 +694,7 @@
 
   .roster-del:hover { color: #DA012D; }
 
-  @media (max-width: 600px) {
-    .roster-head, .roster-row, .roster-totals {
-      grid-template-columns: 2fr 1fr 1fr;
-    }
-    .roster-head span:nth-child(4),
-    .roster-head span:nth-child(5),
-    .roster-row div:nth-child(4),
-    .roster-row div:nth-child(5),
-    .roster-totals span:nth-child(4),
-    .roster-totals span:nth-child(5) { display: none; }
-  }
+
 
 
   #ant-pct::-webkit-outer-spin-button, #ant-pct::-webkit-inner-spin-button,
@@ -726,6 +725,7 @@
   <section>
     <div class="slabel">Client Roster</div>
     <div class="roster-wrap">
+      <div class="roster-scroll"><div class="roster-inner">
       <div class="roster-head">
         <span>Client</span>
         <span>Tier</span>
@@ -741,6 +741,7 @@
         <span id="rt-ant" style="color:#DA012D">$0</span>
         <span id="rt-kat" style="color:#68a3d0">$0</span>
       </div>
+      </div></div>
       <div class="roster-add">
         <input type="text" id="roster-name" placeholder="Client name..." />
         <select id="roster-tier">
