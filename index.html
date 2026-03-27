@@ -516,12 +516,12 @@
   }
 
   .roster-inner {
-    min-width: 600px;
+    min-width: 720px;
   }
 
   .roster-head {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 2fr 1fr 1fr 0.9fr 1fr 1fr;
     background: var(--s3);
     padding: 10px 16px;
     border-bottom: 1px solid var(--border);
@@ -540,7 +540,7 @@
 
   .roster-row {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 2fr 1fr 1fr 0.9fr 1fr 1fr;
     padding: 11px 16px;
     border-bottom: 1px solid var(--s3);
     align-items: center;
@@ -603,7 +603,7 @@
 
   .roster-totals {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 2fr 1fr 1fr 0.9fr 1fr 1fr;
     padding: 10px 16px;
     background: var(--s3);
     border-top: 1px solid var(--border);
@@ -700,6 +700,115 @@
   #ant-pct::-webkit-outer-spin-button, #ant-pct::-webkit-inner-spin-button,
   #kat-pct::-webkit-outer-spin-button, #kat-pct::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   #ant-pct, #kat-pct { -moz-appearance: textfield; }
+
+  /* ─── SPLIT INPUTS ─── */
+  .split-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    justify-content: flex-end;
+  }
+  .split-pill .sp-ant { color: #DA012D; font-weight: 500; }
+  .split-pill .sp-sep { color: var(--muted2); }
+  .split-pill .sp-kat { color: #68a3d0; font-weight: 500; }
+
+  .split-edit-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted2);
+    font-size: 11px;
+    padding: 0 0 0 5px;
+    line-height: 1;
+    transition: color 0.15s;
+  }
+  .split-edit-btn:hover { color: #161616; }
+
+  .split-inline-editor {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    justify-content: flex-end;
+  }
+  .split-inline-editor input[type="number"] {
+    width: 42px;
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    border-radius: 5px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 3px 5px;
+    color: var(--text);
+    text-align: center;
+    -moz-appearance: textfield;
+  }
+  .split-inline-editor input::-webkit-outer-spin-button,
+  .split-inline-editor input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .split-inline-editor .sep { color: var(--muted2); font-size: 10px; font-family: 'DM Mono', monospace; }
+  .split-save-btn {
+    background: #161616;
+    color: #fdfaf3;
+    border: none;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: opacity 0.15s;
+  }
+  .split-save-btn:hover { opacity: 0.75; }
+  .split-cancel-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted2);
+    font-size: 14px;
+    padding: 0 2px;
+    line-height: 1;
+    transition: color 0.15s;
+  }
+  .split-cancel-btn:hover { color: #DA012D; }
+
+  .roster-add-split {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .roster-add-split label {
+    font-size: 10px;
+    color: var(--muted2);
+    font-family: 'Inter', sans-serif;
+    white-space: nowrap;
+  }
+  .roster-add-split input[type="number"] {
+    width: 52px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    font-size: 12px;
+    padding: 7px 8px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    outline: none;
+    text-align: center;
+    -moz-appearance: textfield;
+    transition: border-color 0.15s;
+  }
+  .roster-add-split input:focus { border-color: #DA012D; }
+  .roster-add-split input::-webkit-outer-spin-button,
+  .roster-add-split input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .split-preview {
+    font-size: 10px;
+    color: var(--muted2);
+    font-family: 'DM Mono', monospace;
+    white-space: nowrap;
+  }
+  .split-preview .sp-ant { color: #DA012D; }
+  .split-preview .sp-kat { color: #68a3d0; }
 </style>
 </head>
 <body>
@@ -730,14 +839,16 @@
         <span>Client</span>
         <span>Tier</span>
         <span>Monthly</span>
-        <span style="color:#DA012D">Anthony 60%</span>
-        <span style="color:#68a3d0">Katie 40%</span>
+        <span style="text-align:right">Split</span>
+        <span style="color:#DA012D">Anthony</span>
+        <span style="color:#68a3d0">Katie</span>
       </div>
       <div id="roster-body"></div>
       <div class="roster-totals" id="roster-totals">
         <span>Total</span>
         <span></span>
         <span id="rt-gross">$0</span>
+        <span></span>
         <span id="rt-ant" style="color:#DA012D">$0</span>
         <span id="rt-kat" style="color:#68a3d0">$0</span>
       </div>
@@ -751,6 +862,11 @@
           <option value="custom">Custom rate...</option>
         </select>
         <input type="text" id="roster-custom" placeholder="$/mo" style="display:none;width:90px;flex:none">
+        <div class="roster-add-split">
+          <label>Anthony&nbsp;%</label>
+          <input type="number" id="roster-ant-pct" value="60" min="0" max="100" oninput="onAntPctInput(this.value)">
+          <span class="split-preview"><span class="sp-ant" id="form-ant-preview">60%</span> / <span class="sp-kat" id="form-kat-preview">40%</span></span>
+        </div>
         <button class="roster-add-btn" onclick="addClient()">+ Add</button>
       </div>
     </div>
@@ -972,27 +1088,41 @@ function onSlide(i, v) {
 }
 
 function recalc() {
-  let tc = 0, gross = 0;
-  TIERS.forEach(t => { tc += t.clients; gross += t.clients * (t.rate || 0); });
+  // Named clients per standard tier
+  var namedPerTier = {};
+  CLIENTS.forEach(function(c) {
+    if (c.tier !== 'custom') {
+      namedPerTier[c.tier] = (namedPerTier[c.tier] || 0) + 1;
+    }
+  });
 
-  // Add custom-tier clients (not tracked by sliders)
-  var customGross = 0, customAnt = 0, customKat = 0;
-  if (typeof CLIENTS !== 'undefined') {
-    CLIENTS.forEach(function(c) {
-      if (c.tier === 'custom') {
-        customGross += c.rate;
-        customAnt += c.ant;
-        customKat += c.kat;
-        tc++;
-      }
-    });
-  }
+  // TIERS sliders: count hypothetical (slider count beyond named clients) at default 60/40
+  let tc = 0, hypoGross = 0, hypoAnt = 0, hypoKat = 0;
+  TIERS.forEach(function(t, i) {
+    var sliderCount = TIERS[i].clients;
+    var named = namedPerTier[String(t.rate)] || 0;
+    var hypo = Math.max(0, sliderCount - named);
+    tc += sliderCount;
+    hypoGross += hypo * t.rate;
+    hypoAnt   += hypo * t.rate * 0.60;
+    hypoKat   += hypo * t.rate * 0.40;
+  });
 
-  var antPctVal = 0.60;
-  var katPctVal = 0.40;
-  const totalGross = gross + customGross;
-  const ant = (gross * antPctVal) + customAnt;
-  const kat = (gross * katPctVal) + customKat;
+  // All named clients use per-client splits
+  var namedGross = 0, namedAnt = 0, namedKat = 0;
+  CLIENTS.forEach(function(c) {
+    var ap = (c.antPct !== undefined) ? c.antPct : 60;
+    var kp = (c.katPct !== undefined) ? c.katPct : 40;
+    namedGross += c.rate;
+    namedAnt   += c.rate * ap / 100;
+    namedKat   += c.rate * kp / 100;
+    if (c.tier === 'custom') tc++;
+  });
+
+  const totalGross = hypoGross + namedGross;
+  const ant = hypoAnt + namedAnt;
+  const kat = hypoKat + namedKat;
+
   document.getElementById('m-clients').textContent = tc;
   document.getElementById('m-gross').textContent = fmt(totalGross);
   document.getElementById('m-ant').textContent = fmt(ant);
@@ -1066,8 +1196,8 @@ const TIER_NAMES = { '1500': 'Silver', '3000': 'Gold', '5000': 'Platinum', 'cust
 const TIER_BADGES = { '1500': 'badge-silver', '3000': 'badge-gold', '5000': 'badge-platinum', 'custom': 'badge-custom' };
 
 let CLIENTS = [
-  { name: 'VIXEN&#174;', tier: 'custom', rate: 11500, ant: 10000, kat: 1500, since: 'Jan 2026', isNew: false, customSplit: true },
-  { name: 'Goodchat&#174;', tier: '5000', rate: 5000, ant: 3000, kat: 2000, since: 'Mar 2026', isNew: false, customSplit: false }
+  { name: 'VIXEN&#174;', tier: 'custom', rate: 11500, antPct: 87, katPct: 13, since: 'Jan 2026', isNew: false },
+  { name: 'Goodchat&#174;', tier: '5000', rate: 5000, antPct: 60, katPct: 40, since: 'Mar 2026', isNew: false }
 ];
 
 document.getElementById('roster-tier').addEventListener('change', function() {
@@ -1098,6 +1228,15 @@ function syncTiersFromRoster() {
   });
 }
 
+function onAntPctInput(val) {
+  var ap = Math.min(100, Math.max(0, parseInt(val) || 0));
+  var kp = 100 - ap;
+  var prev = document.getElementById('form-ant-preview');
+  var prevK = document.getElementById('form-kat-preview');
+  if (prev) prev.textContent = ap + '%';
+  if (prevK) prevK.textContent = kp + '%';
+}
+
 function addClient() {
   var name = document.getElementById('roster-name').value.trim();
   var tierVal = document.getElementById('roster-tier').value;
@@ -1108,15 +1247,17 @@ function addClient() {
   } else {
     rate = parseInt(tierVal);
   }
-  var ant = Math.round(rate * 0.60);
-  var kat = Math.round(rate * 0.40);
+  var antPct = Math.min(100, Math.max(0, parseInt(document.getElementById('roster-ant-pct').value) || 60));
+  var katPct = 100 - antPct;
   var now = new Date();
   var since = now.toLocaleString('default', { month: 'short' }) + ' ' + now.getFullYear();
-  CLIENTS.push({ name: name, tier: tierVal, rate: rate, ant: ant, kat: kat, since: since, isNew: true, customSplit: false });
+  CLIENTS.push({ name: name, tier: tierVal, rate: rate, antPct: antPct, katPct: katPct, since: since, isNew: true });
   document.getElementById('roster-name').value = '';
   document.getElementById('roster-custom').value = '';
   document.getElementById('roster-custom').style.display = 'none';
   document.getElementById('roster-tier').value = '1500';
+  document.getElementById('roster-ant-pct').value = '60';
+  onAntPctInput(60);
   syncTiersFromRoster();
   recalc();
   renderRoster();
@@ -1129,19 +1270,52 @@ function removeClient(i) {
   renderRoster();
 }
 
+function editSplit(i) {
+  var c = CLIENTS[i];
+  var row = document.getElementById('split-cell-' + i);
+  if (!row) return;
+  row.innerHTML =
+    '<div class="split-inline-editor">' +
+      '<input type="number" id="edit-ant-' + i + '" value="' + c.antPct + '" min="0" max="100" ' +
+        'oninput="(function(v){var k=document.getElementById(\'edit-kat-' + i + '\');if(k)k.value=100-Math.min(100,Math.max(0,parseInt(v)||0));})(this.value)">' +
+      '<span class="sep">/</span>' +
+      '<input type="number" id="edit-kat-' + i + '" value="' + c.katPct + '" min="0" max="100" ' +
+        'oninput="(function(v){var a=document.getElementById(\'edit-ant-' + i + '\');if(a)a.value=100-Math.min(100,Math.max(0,parseInt(v)||0));})(this.value)">' +
+      '<button class="split-save-btn" onclick="saveSplit(' + i + ')">✓</button>' +
+      '<button class="split-cancel-btn" onclick="renderRoster()">&times;</button>' +
+    '</div>';
+}
+
+function saveSplit(i) {
+  var antInput = document.getElementById('edit-ant-' + i);
+  if (!antInput) return;
+  var ap = Math.min(100, Math.max(0, parseInt(antInput.value) || 0));
+  var kp = 100 - ap;
+  CLIENTS[i].antPct = ap;
+  CLIENTS[i].katPct = kp;
+  syncTiersFromRoster();
+  recalc();
+  renderRoster();
+}
+
 function renderRoster() {
   var body = document.getElementById('roster-body');
   var rows = '';
   var totalGross = 0, totalAnt = 0, totalKat = 0;
 
   CLIENTS.forEach(function(c, i) {
+    var ap = (c.antPct !== undefined) ? c.antPct : 60;
+    var kp = (c.katPct !== undefined) ? c.katPct : 40;
+    var cAnt = c.rate * ap / 100;
+    var cKat = c.rate * kp / 100;
     totalGross += c.rate;
-    totalAnt += c.ant;
-    totalKat += c.kat;
+    totalAnt += cAnt;
+    totalKat += cKat;
     var badge = TIER_BADGES[c.tier] || 'badge-custom';
     var tierLabel = TIER_NAMES[c.tier] || 'Custom';
     var dot = c.isNew ? 'dot-new' : 'dot-active';
-    var splitNote = c.customSplit ? ' &middot; Custom split' : '';
+    var isCustomSplit = (ap !== 60 || kp !== 40);
+    var splitNote = isCustomSplit ? ' &middot; Custom split' : '';
     rows += '<div class="roster-row">' +
       '<div>' +
         '<div class="client-name"><span class="status-dot ' + dot + '"></span>' + c.name + '</div>' +
@@ -1149,11 +1323,17 @@ function renderRoster() {
       '</div>' +
       '<div><span class="tier-badge ' + badge + '">' + tierLabel + '</span></div>' +
       '<div class="roster-mono">' + fmt(c.rate) + '</div>' +
-      '<div class="roster-mono" style="color:#DA012D;display:flex;align-items:center;justify-content:flex-end;gap:6px">' +
-        fmt(c.ant) +
+      '<div id="split-cell-' + i + '" style="text-align:right">' +
+        '<span class="split-pill">' +
+          '<span class="sp-ant">' + ap + '%</span>' +
+          '<span class="sp-sep">/</span>' +
+          '<span class="sp-kat">' + kp + '%</span>' +
+        '</span>' +
+        '<button class="split-edit-btn" onclick="editSplit(' + i + ')" title="Edit split">✎</button>' +
       '</div>' +
+      '<div class="roster-mono" style="color:#DA012D">' + fmt(cAnt) + '</div>' +
       '<div class="roster-mono" style="color:#68a3d0;display:flex;align-items:center;justify-content:flex-end;gap:6px">' +
-        fmt(c.kat) +
+        fmt(cKat) +
         '<button class="roster-del" onclick="removeClient(' + i + ')" title="Remove">&times;</button>' +
       '</div>' +
     '</div>';
