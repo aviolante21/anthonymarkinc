@@ -731,13 +731,13 @@
 
   .targeted-photo-wrap {
     position: relative;
-    width: 88px;
-    height: 88px;
+    width: 56px;
+    height: 56px;
   }
 
   .targeted-photo {
-    width: 88px;
-    height: 88px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--border);
@@ -775,7 +775,7 @@
     text-transform: uppercase;
     color: var(--muted);
     text-align: center;
-    max-width: 88px;
+    max-width: 64px;
     line-height: 1.3;
     font-family: 'Inter', sans-serif;
   }
@@ -1358,7 +1358,7 @@ function sizeTargetedItems() {
   var gap = 12;
   var visibleCount = 6;
   var itemW = Math.floor((outerW - padding - gap * (visibleCount - 1)) / visibleCount);
-  itemW = Math.max(60, Math.min(itemW, 130));
+  itemW = Math.max(50, Math.min(itemW, 80));
   items.forEach(function(item) {
     var photo = item.querySelector('.targeted-photo');
     var wrap = item.querySelector('.targeted-photo-wrap');
