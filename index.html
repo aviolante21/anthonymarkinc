@@ -780,6 +780,12 @@
     font-family: 'Inter', sans-serif;
   }
 
+  .split-pct-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted2);
+  }
+
 </style>
 </head>
 <body>
@@ -808,10 +814,10 @@
       <div class="roster-scroll"><div class="roster-inner">
       <div class="roster-head">
         <span>Client</span>
-        <span>Tier</span>
         <span>Monthly</span>
-        <span style="color:#DA012D">Anthony 60%</span>
-        <span style="color:#68a3d0">Katie 40%</span>
+        <span>Split</span>
+        <span style="color:#DA012D">Anthony</span>
+        <span style="color:#68a3d0">Katie</span>
       </div>
       <div id="roster-body"></div>
       <div class="roster-totals" id="roster-totals">
@@ -822,7 +828,7 @@
         <span id="rt-kat" style="color:#68a3d0">$0</span>
       </div>
       </div></div>
-      <div class="roster-add">
+      <div class="roster-add" style="flex-wrap:wrap;gap:8px">
         <input type="text" id="roster-name" placeholder="Client name..." />
         <select id="roster-tier">
           <option value="1500">Silver — $1,500</option>
@@ -831,7 +837,18 @@
           <option value="custom">Custom rate...</option>
         </select>
         <input type="text" id="roster-custom" placeholder="$/mo" style="display:none;width:90px;flex:none">
-        <button class="roster-add-btn" onclick="addClient()">+ Add</button>
+        <div style="display:flex;align-items:center;gap:8px;width:100%;padding-top:4px">
+          <span style="font-size:11px;color:var(--muted);font-family:'Inter',sans-serif">Anthony %</span>
+          <input type="number" id="add-ant-pct" value="60" min="1" max="99"
+            oninput="updateAddPreview()"
+            style="width:60px;font-family:'DM Mono',monospace;font-size:14px;font-weight:500;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);text-align:center;padding:5px 8px;outline:none;-moz-appearance:textfield">
+          <span id="add-split-preview" style="font-size:12px;font-family:'DM Mono',monospace">
+            <span style="color:#DA012D;font-weight:500">60%</span>
+            <span style="color:var(--muted);margin:0 3px">/</span>
+            <span style="color:#68a3d0;font-weight:500">40%</span>
+          </span>
+          <button class="roster-add-btn" onclick="addClient()" style="margin-left:auto">+ Add</button>
+        </div>
       </div>
     </div>
   </section>
@@ -997,8 +1014,8 @@
           <tr>
             <th>Month</th>
             <th style="color:#60b177">Cumulative</th>
-            <th style="color:#DA012D" id="th-ant">Anthony 60% Net</th>
-            <th style="color:var(--pink)" id="th-kat">Katie 40% Net</th>
+            <th style="color:#DA012D" id="th-ant">Anthony Net</th>
+            <th style="color:var(--pink)" id="th-kat">Katie Net</th>
           </tr>
         </thead>
         <tbody id="proj-body"></tbody>
@@ -1026,8 +1043,8 @@ function onTaxToggle() {
   var moLabel = taxOn ? 'Net / Month' : 'Gross / Month';
   var yrLabel = taxOn ? 'Net / Year'  : 'Gross / Year';
   var splitLbl = taxOn ? 'Net Ownership Split' : 'Gross Ownership Split';
-  var antTh = taxOn ? 'Anthony 60% Net' : 'Anthony 60%';
-  var katTh = taxOn ? 'Katie 40% Net' : 'Katie 40%';
+  var antTh = taxOn ? 'Anthony Net' : 'Anthony';
+  var katTh = taxOn ? 'Katie Net' : 'Katie';
 
   ['ant-tax-note','ant-tax-note2','kat-tax-note','kat-tax-note2'].forEach(function(id) {
     var el = document.getElementById(id);
@@ -1195,8 +1212,8 @@ const TIER_NAMES = { '1500': 'Silver', '3000': 'Gold', '5000': 'Platinum', 'cust
 const TIER_BADGES = { '1500': 'badge-silver', '3000': 'badge-gold', '5000': 'badge-platinum', 'custom': 'badge-custom' };
 
 let CLIENTS = [
-  { name: 'VIXEN&#174;', tier: 'custom', rate: 11500, ant: 10000, kat: 1500, since: 'Jan 2026', isNew: false, customSplit: true },
-  { name: 'Goodchat&#174;', tier: '5000', rate: 5000, ant: 3000, kat: 2000, since: 'Mar 2026', isNew: false, customSplit: false }
+  { name: 'VIXEN&#174;', tier: 'custom', rate: 11500, ant: 6900, kat: 4600, since: 'Jan 2026', isNew: false, customSplit: false, antPct: 60 },
+  { name: 'Goodchat&#174;', tier: '5000', rate: 5000, ant: 3000, kat: 2000, since: 'Mar 2026', isNew: false, customSplit: false, antPct: 60 }
 ];
 
 document.getElementById('roster-tier').addEventListener('change', function() {
@@ -1227,6 +1244,34 @@ function syncTiersFromRoster() {
   });
 }
 
+
+
+
+function updateAddPreview() {
+  var ap = Math.min(99, Math.max(1, parseInt(document.getElementById('add-ant-pct').value) || 60));
+  var kp = 100 - ap;
+  var el = document.getElementById('add-split-preview');
+  if (el) el.innerHTML = '<span style="color:#DA012D;font-weight:500">' + ap + '%</span><span style="color:var(--muted);margin:0 3px">/</span><span style="color:#68a3d0;font-weight:500">' + kp + '%</span>';
+}
+
+function editSplit(i) {
+  var current = CLIENTS[i].antPct || 60;
+  var val = prompt('Anthony % for ' + CLIENTS[i].name + ':', current);
+  if (val === null) return;
+  updateClientSplit(i, val);
+}
+
+function updateClientSplit(i, antPctVal) {
+  antPctVal = Math.min(99, Math.max(1, parseInt(antPctVal) || 60));
+  CLIENTS[i].antPct = antPctVal;
+  CLIENTS[i].ant = Math.round(CLIENTS[i].rate * (antPctVal / 100));
+  CLIENTS[i].kat = CLIENTS[i].rate - CLIENTS[i].ant;
+  CLIENTS[i].customSplit = true;
+  // Update the since note
+  renderRoster();
+  recalc();
+}
+
 function addClient() {
   var name = document.getElementById('roster-name').value.trim();
   var tierVal = document.getElementById('roster-tier').value;
@@ -1237,11 +1282,12 @@ function addClient() {
   } else {
     rate = parseInt(tierVal);
   }
-  var ant = Math.round(rate * 0.60);
-  var kat = Math.round(rate * 0.40);
+  var newAntPct = Math.min(99, Math.max(1, parseInt(document.getElementById("add-ant-pct").value) || 60));
+  var ant = Math.round(rate * (newAntPct / 100));
+  var kat = rate - ant;
   var now = new Date();
   var since = now.toLocaleString('default', { month: 'short' }) + ' ' + now.getFullYear();
-  CLIENTS.push({ name: name, tier: tierVal, rate: rate, ant: ant, kat: kat, since: since, isNew: true, customSplit: false });
+  CLIENTS.push({ name: name, tier: tierVal, rate: rate, ant: ant, kat: kat, since: since, isNew: true, customSplit: false, antPct: newAntPct });
   document.getElementById('roster-name').value = '';
   document.getElementById('roster-custom').value = '';
   document.getElementById('roster-custom').style.display = 'none';
@@ -1267,20 +1313,22 @@ function renderRoster() {
     totalGross += c.rate;
     totalAnt += c.ant;
     totalKat += c.kat;
-    var badge = TIER_BADGES[c.tier] || 'badge-custom';
-    var tierLabel = TIER_NAMES[c.tier] || 'Custom';
     var dot = c.isNew ? 'dot-new' : 'dot-active';
-    var splitNote = c.customSplit ? ' &middot; Custom split' : '';
+    var ap = c.antPct || 60;
+    var kp = 100 - ap;
     rows += '<div class="roster-row">' +
       '<div>' +
         '<div class="client-name"><span class="status-dot ' + dot + '"></span>' + c.name + '</div>' +
-        '<div class="client-since">Since ' + c.since + splitNote + '</div>' +
+        '<div class="client-since">Since ' + c.since + '</div>' +
       '</div>' +
-      '<div><span class="tier-badge ' + badge + '">' + tierLabel + '</span></div>' +
       '<div class="roster-mono">' + fmt(c.rate) + '</div>' +
-      '<div class="roster-mono" style="color:#DA012D;display:flex;align-items:center;justify-content:flex-end;gap:6px">' +
-        fmt(c.ant) +
+      '<div class="roster-mono">' +
+        '<span style="color:#DA012D;font-weight:500">' + ap + '%</span>' +
+        '<span style="color:var(--muted);margin:0 3px">/</span>' +
+        '<span style="color:#68a3d0;font-weight:500">' + kp + '%</span>' +
+        '&nbsp;<button onclick="editSplit(' + i + ')" title="Edit split" style="background:none;border:none;cursor:pointer;color:var(--muted2);font-size:13px;padding:0;line-height:1;vertical-align:middle">&#9998;</button>' +
       '</div>' +
+      '<div class="roster-mono" style="color:#DA012D">' + fmt(c.ant) + '</div>' +
       '<div class="roster-mono" style="color:#68a3d0;display:flex;align-items:center;justify-content:flex-end;gap:6px">' +
         fmt(c.kat) +
         '<button class="roster-del" onclick="removeClient(' + i + ')" title="Remove">&times;</button>' +
