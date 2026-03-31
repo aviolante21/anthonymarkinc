@@ -1279,10 +1279,8 @@ function onSlide(i, v) {
 
 
 // ── KATIE SALARY BASELINE ──
-var KATIE_SALARY_GROSS = 60996;   // annual (5083 x 12)
-var KATIE_SALARY_NET   = 48744;   // annual (4062 x 12) after tax
-var KATIE_SALARY_MO_GROSS = 5083; // monthly gross
-var KATIE_SALARY_MO_NET   = 4062; // monthly net (4062 x 12 = 48744 annual)
+var KATIE_SALARY_MO_GROSS = 5083;  // $61,000 / 12, rounded
+var KATIE_SALARY_GROSS    = KATIE_SALARY_MO_GROSS * 12; // 60,996
 
 function recalc() {
   // All financial totals come from CLIENTS — each client stores its own ant/kat
@@ -1306,8 +1304,8 @@ function recalc() {
   document.getElementById('ant-yr').textContent = fmt(antAfterSalary * 12 * (1 - TAX));
   var katRevNetMo = kat * (1 - TAX);
   var katRevNetYr = kat * 12 * (1 - TAX);
-  var katSalaryDisplayMo = taxOn ? KATIE_SALARY_MO_NET   : KATIE_SALARY_MO_GROSS;
-  var katSalaryDisplayYr = taxOn ? KATIE_SALARY_NET       : KATIE_SALARY_GROSS;
+  var katSalaryDisplayMo = taxOn ? Math.round(KATIE_SALARY_MO_GROSS * (1 - TAX)) : KATIE_SALARY_MO_GROSS;
+  var katSalaryDisplayYr = katSalaryDisplayMo * 12;
   var katTotalNetMo = katRevNetMo + katSalaryDisplayMo;
   var katTotalNetYr = katRevNetYr + katSalaryDisplayYr;
   document.getElementById('kat-mo').textContent = fmt(katTotalNetMo);
@@ -1320,7 +1318,7 @@ function recalc() {
 
   let html = '', cum = 0, cumAnt = 0, cumKat = 0;
   const cumA = [], cumAntA = [], cumKatA = [];
-  var katSalaryMo = taxOn ? KATIE_SALARY_MO_NET : KATIE_SALARY_MO_GROSS;
+  var katSalaryMo = taxOn ? Math.round(KATIE_SALARY_MO_GROSS * (1 - TAX)) : KATIE_SALARY_MO_GROSS;
   for (let i = 0; i < 12; i++) {
     cum += totalGross;
     cumAnt += antAfterSalary * (1 - (taxOn ? 0.22 : 0));
