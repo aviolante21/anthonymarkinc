@@ -149,7 +149,7 @@
   /* ─── TIER GRID ─── */
   .tier-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 12px;
   }
 
@@ -593,6 +593,7 @@
   .badge-gold     { background: rgba(96,177,119,0.15); color: #3a7a50; }
   .badge-platinum { background: rgba(104,163,208,0.15); color: #2d6a9f; }
   .badge-custom   { background: rgba(218,1,45,0.08); color: #DA012D; }
+  .badge-vip      { background: rgba(139,80,220,0.12); color: #7b35cc; }
 
   .roster-mono {
     font-family: 'DM Mono', monospace;
@@ -703,9 +704,7 @@
 
   /* ─── TARGETED CLIENTS ─── */
   .targeted-outer {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    overflow-x: visible;
     padding: 4px 2px 8px;
   }
 
@@ -713,21 +712,22 @@
 
   .targeted-wrap {
     display: flex;
-    gap: 14px;
+    gap: 10px;
     flex-wrap: nowrap;
-    min-width: max-content;
+    width: 100%;
+    justify-content: space-between;
   }
 
   .targeted-card {
     background: var(--s1);
     border: 1px solid var(--border);
     border-radius: 16px;
-    padding: 1.25rem 1rem 1rem;
+    padding: 1rem 0.75rem 0.9rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    width: 150px;
+    gap: 8px;
+    width: 130px;
     flex-shrink: 0;
     position: relative;
     cursor: default;
@@ -991,6 +991,7 @@
           <option value="1500">Silver — $1,500</option>
           <option value="3000">Gold — $3,000</option>
           <option value="5000">Platinum — $5,000</option>
+          <option value="8000">VIP — $8,000</option>
           <option value="custom">Custom rate...</option>
         </select>
         <input type="text" id="roster-custom" placeholder="$/mo" style="display:none;width:90px;flex:none">
@@ -1158,6 +1159,7 @@
         <option value="1500">Silver — $1,500/mo</option>
         <option value="3000">Gold — $3,000/mo</option>
         <option value="5000" selected>Platinum — $5,000/mo</option>
+        <option value="8000">VIP — $8,000/mo</option>
         <option value="custom">Custom rate...</option>
       </select>
     </div>
@@ -1228,7 +1230,8 @@ function onTaxToggle() {
 const TIERS = [
   { name: 'Silver',   rate: 1500, color: '#161616', clients: 0 },
   { name: 'Gold',     rate: 3000, color: '#161616', clients: 0 },
-  { name: 'Platinum', rate: 5000, color: '#161616', clients: 0 }
+  { name: 'Platinum', rate: 5000, color: '#161616', clients: 0 },
+  { name: 'VIP',      rate: 8000, color: '#161616', clients: 0 }
 ];
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -1354,9 +1357,9 @@ function recalc() {
 
 
 // ── CLIENT ROSTER ──
-const TIER_RATES = { '1500': 1500, '3000': 3000, '5000': 5000 };
-const TIER_NAMES = { '1500': 'Silver', '3000': 'Gold', '5000': 'Platinum', 'custom': 'Custom' };
-const TIER_BADGES = { '1500': 'badge-silver', '3000': 'badge-gold', '5000': 'badge-platinum', 'custom': 'badge-custom' };
+const TIER_RATES = { '1500': 1500, '3000': 3000, '5000': 5000, '8000': 8000 };
+const TIER_NAMES = { '1500': 'Silver', '3000': 'Gold', '5000': 'Platinum', '8000': 'VIP', 'custom': 'Custom' };
+const TIER_BADGES = { '1500': 'badge-silver', '3000': 'badge-gold', '5000': 'badge-platinum', '8000': 'badge-vip', 'custom': 'badge-custom' };
 
 let CLIENTS = [
   { name: 'VIXEN Media Group&#174;', tier: 'custom', rate: 11500, ant: 8050, kat: 3450, since: 'Jan 2026', isNew: false, customSplit: false, antPct: 70 },
@@ -1370,7 +1373,7 @@ document.getElementById('roster-tier').addEventListener('change', function() {
 
 function syncTiersFromRoster() {
   // Count clients per standard tier
-  var counts = { '1500': 0, '3000': 0, '5000': 0 };
+  var counts = { '1500': 0, '3000': 0, '5000': 0, '8000': 0 };
   CLIENTS.forEach(function(c) {
     if (counts[c.tier] !== undefined) counts[c.tier]++;
   });
