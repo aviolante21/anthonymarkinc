@@ -959,12 +959,35 @@
       <div class="brand-sub">Revenue Intelligence Dashboard</div>
     </div>
     <div class="toggle-wrap">
-      <span class="toggle-label on" id="toggle-label">Taxes</span>
-      <label class="toggle">
-        <input type="checkbox" id="tax-toggle" onchange="onTaxToggle()" checked>
-        <div class="toggle-track"></div>
-        <div class="toggle-thumb"></div>
-      </label>
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:#DA012D;white-space:nowrap">Anthony Base</span>
+          <div style="position:relative;display:flex;align-items:center">
+            <span style="position:absolute;left:8px;font-size:12px;font-family:'DM Mono',monospace;color:var(--muted)">$</span>
+            <input type="number" id="ant-baseline-input" value="125000" min="0" step="1000"
+              oninput="onBaselineChange()"
+              style="width:90px;padding:4px 6px 4px 18px;font-family:'DM Mono',monospace;font-size:12px;font-weight:500;background:var(--s2);border:1px solid var(--border);border-radius:7px;color:#DA012D;text-align:right;outline:none;-moz-appearance:textfield">
+          </div>
+          <span style="font-size:10px;color:var(--muted2)">/yr</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:#68a3d0;white-space:nowrap">Katie Base</span>
+          <div style="position:relative;display:flex;align-items:center">
+            <span style="position:absolute;left:8px;font-size:12px;font-family:'DM Mono',monospace;color:var(--muted)">$</span>
+            <input type="number" id="kat-baseline-input" value="61000" min="0" step="1000"
+              oninput="onBaselineChange()"
+              style="width:90px;padding:4px 6px 4px 18px;font-family:'DM Mono',monospace;font-size:12px;font-weight:500;background:var(--s2);border:1px solid var(--border);border-radius:7px;color:#68a3d0;text-align:right;outline:none;-moz-appearance:textfield">
+          </div>
+          <span style="font-size:10px;color:var(--muted2)">/yr</span>
+        </div>
+        <div style="width:1px;height:20px;background:var(--border);margin:0 2px"></div>
+        <span class="toggle-label on" id="toggle-label">Taxes</span>
+        <label class="toggle">
+          <input type="checkbox" id="tax-toggle" onchange="onTaxToggle()" checked>
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
     </div>
   </header>
 
@@ -1072,7 +1095,7 @@
         </div>
         <div class="partner-stats">
           <div>
-            <div class="pstat-label" id="ant-mo-label">Net / Month <span id="ant-tax-note" style="font-size:8px;opacity:0.6">after 22% tax</span></div>
+            <div class="pstat-label" id="ant-mo-label">Net / Month <span id="ant-tax-note" style="font-size:8px;opacity:0.6">baseline + clients</span></div>
             <div class="pstat-val" id="ant-mo" style="color:#DA012D">$0</div>
           </div>
           <div style="text-align:right">
@@ -1095,7 +1118,7 @@
         </div>
         <div class="partner-stats">
           <div>
-            <div class="pstat-label" id="kat-mo-label">Net / Month <span id="kat-tax-note" style="font-size:8px;opacity:0.6">after 22% tax</span></div>
+            <div class="pstat-label" id="kat-mo-label">Net / Month <span id="kat-tax-note" style="font-size:8px;opacity:0.6">baseline + clients</span></div>
             <div class="pstat-val" id="kat-mo" style="color:var(--pink)">$0</div>
           </div>
           <div style="text-align:right">
@@ -1317,15 +1340,21 @@ function recalc() {
   document.getElementById('m-ant').textContent = fmt(ant);
   document.getElementById('m-kat').textContent = fmt(kat);
   const TAX = taxOn ? 0.22 : 0;
-  document.getElementById('ant-mo').textContent = fmt(ant * (1 - TAX));
-  document.getElementById('ant-yr').textContent = fmt(ant * 12 * (1 - TAX));
-  document.getElementById('kat-mo').textContent = fmt(kat * (1 - TAX));
-  document.getElementById('kat-yr').textContent = fmt(kat * 12 * (1 - TAX));
+  // Add baseline salaries to partner earnings
+  const antTotal = ant + getAntBaseline();
+  const katTotal = kat + getKatBaseline();
+  document.getElementById('ant-mo').textContent = fmt(antTotal * (1 - TAX));
+  document.getElementById('ant-yr').textContent = fmt(antTotal * 12 * (1 - TAX));
+  document.getElementById('kat-mo').textContent = fmt(katTotal * (1 - TAX));
+  document.getElementById('kat-yr').textContent = fmt(katTotal * 12 * (1 - TAX));
 
   let html = '', cum = 0, cumAnt = 0, cumKat = 0;
   const cumA = [], cumAntA = [], cumKatA = [];
+  const TAX2 = taxOn ? 0.22 : 0;
   for (let i = 0; i < 12; i++) {
-    cum += totalGross; cumAnt += ant * (1 - (taxOn ? 0.22 : 0)); cumKat += kat * (1 - (taxOn ? 0.22 : 0));
+    cum += totalGross;
+    cumAnt += (ant + getAntBaseline()) * (1 - TAX2);
+    cumKat += (kat + getKatBaseline()) * (1 - TAX2);
     cumA.push(cum); cumAntA.push(cumAnt); cumKatA.push(cumKat);
     const m = [3, 6, 12].includes(i + 1);
     html += `<tr class="${m ? 'milestone' : ''}">
@@ -1384,10 +1413,18 @@ const TIER_RATES = { '1500': 1500, '3000': 3000, '5000': 5000, '8000': 8000 };
 const TIER_NAMES = { '1500': 'Silver', '3000': 'Gold', '5000': 'Platinum', '8000': 'VIP', 'custom': 'Custom' };
 const TIER_BADGES = { '1500': 'badge-silver', '3000': 'badge-gold', '5000': 'badge-platinum', '8000': 'badge-vip', 'custom': 'badge-custom' };
 
-let CLIENTS = [
-  { name: 'VIXEN Media Group&#174;', tier: 'custom', rate: 11500, ant: 8050, kat: 3450, since: 'Jan 2026', isNew: false, customSplit: false, antPct: 70 },
-  { name: 'Goodchat&#174;', tier: '5000', rate: 5000, ant: 3500, kat: 1500, since: 'Mar 2026', isNew: false, customSplit: false, antPct: 70 }
-];
+// Baseline salaries — read live from inputs
+function getAntBaseline() {
+  var el = document.getElementById('ant-baseline-input');
+  return el ? (parseFloat(el.value) || 0) / 12 : 0;
+}
+function getKatBaseline() {
+  var el = document.getElementById('kat-baseline-input');
+  return el ? (parseFloat(el.value) || 0) / 12 : 0;
+}
+function onBaselineChange() { recalc(); }
+
+let CLIENTS = [];
 
 document.getElementById('roster-tier').addEventListener('change', function() {
   var custom = document.getElementById('roster-custom');
