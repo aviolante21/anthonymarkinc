@@ -441,6 +441,15 @@
     .tier-grid { grid-template-columns: 1fr 1fr; }
     .partner-grid { grid-template-columns: 1fr; }
     .brand-logo { font-size: 34px; }
+
+    /* Stack header: brand on top, salary boxes + tax toggle on a line below */
+    .header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.25rem;
+    }
+    .toggle-wrap { width: 100%; }
+    .toggle-wrap > div { width: 100%; }
   }
 
   @media (max-width: 480px) {
